@@ -1,0 +1,12 @@
+{
+    id: 1
+    imie: Kacper
+    nazwisko: Ksiazek
+    wiek: 20
+}
+{
+    id: 2
+    imie: Weronika
+    nazwisko: Slawacka
+    wiek: 19
+}
