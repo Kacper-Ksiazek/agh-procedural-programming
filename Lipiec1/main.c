@@ -1,134 +1,110 @@
 #include "stdio.h"
-#include "stack.h"
+#include "char_stack.h"
+#include "int_stack.h"
 #include "stdlib.h"
-
-void printStack(StackItem **pStack){
-    printf("\n");
-    StackItem *element = pStack[0];
-
-    while(element != NULL){
-        printf("%c", element->key);
-        element = element->pNext;
-    }
-}
-
-int isSimpleMathOperator(char c){
-    if(c == '+' || c=='-' || c=='/' || c =='*') return 1;
-    return 0;
-}
-
-void validateCharacter(char c){
-    // Sprawdzamy czy znak to cyfra lub operator
-    if('1' <= c && c<='9' || isSimpleMathOperator(c)) return;
-
-    // W przeciwnym razie wyrzucamy blad
-    printf("Niedozwolony znak: %c !!!!",c);
-    exit(1);
-}
-
-float executeSimpleMathOperation(char operation, float arg1, float arg2){
-    if(operation == '+') return arg1 + arg2;
-    if(operation == '-') return arg1 - arg2;
-    if(operation == '*') return arg1 * arg2;
-    if(operation == '/'){
-        if(arg2 == 0) {
-            printf("Nie mozna dzielic przez 0!!!");
-            exit(1);
-        }
-        return arg1 / arg2;
-    }
-}
-
-int charToInt(char c) {
-    return c - 48;
-}
+#include "tools.h"
 
 int main(){
-    StackItem **stack = createStack();
+    char *userInput = getMathEquationFromUser();
+    CharStackItem **equationAsStack = transformUserInputIntoStack(userInput);
 
-    char userInput[MAX_STACK_LENGTH];
-    printf("Podaj dzialanie matematyczne: ");
-    // Objasnienie co to znaczy:
-    // 1. Spacja przed znakiem procenta- mowi, ze scanf_s ma ominac wszystkie znaki biale (spacje/taby) z poczatku string
-    // 2. [^\n] - czytaj wszystko az (^) az do znaku nowej lini (\n)
-    scanf_s(" %[^\n]", userInput);
+    CharStackItem **operators = createCharStack();
+    IntStackItem **numbers = createIntStack();
 
-    int i = 0;
-    char c;
+    char equationElement;
+    int t=-1; // Zmienna pomocnicza do zczytywania liczb; defaultowo -1
+    int power = 1; // Potegi liczby 10, zeby moc dodac liczby wieksze niz 9 do stosu liczbowego
 
-    while((c = userInput[i++])){
-        if(c == ' ') continue; // Omijamy spacje
-
-        validateCharacter(c);
-        push(stack,c);
-    }
-
-    // Sprawdzamy, czy ostatnim znakiem nie jest operator
-    if(isSimpleMathOperator(top(stack))){
-        printf("Dzialanie matematyczne nie moze konczyc sie operatorem !!!");
-        exit(1);
-    }
-
-    // Sprawdzamy, czy pierwszym znakiem nie jest operator
-    if(isSimpleMathOperator(stack[0]->key)){
-        printf("Dzialanie matematyczne nie moze zaczynac sie operatorem !!!");
-        exit(1);
-    }
-
-    // Wykonujemy dzialanie matematyczne
-    float result = 0;
-    float arg1=0;
-    float arg2=0;
-    char operator = 0;
-//    char c;
-
-    int power = 1; // Potega liczby 10
-    int currentCharacterIsOperator;
-
-    while(isEmpty(stack) == 0){
-        c = pop(stack);
-        currentCharacterIsOperator = isSimpleMathOperator(c);
-
-        // Jezeli nie mamy jeszcze zlapanego operatora, to cyfry wlatuja do argumentu pierwszego
-        if(operator == 0 && currentCharacterIsOperator==0){
-            arg1+= (float)(charToInt(c) * power); // Ten zapis (float)NAWIAS zamienia wartosc NAWIASU na float'a
+    // Lecimy po wszystkich znakach w rownaniu od prawej do lewej strony (zgodnie z idea stosu)
+    while(isEmpty_char(equationAsStack)== 0){
+        equationElement = pop_char(equationAsStack);
+        // Jezeli obecny znak jest operatorem matematycznym, sprawdzamy, czy czasem nie bylismy
+        // w trakcie czytania jakies liczby
+        if(isSimpleMathOperator(equationElement)){
+            push_char(operators,equationElement);
+            // W momencie, w ktorym t nie rowna sie wartosci domyslnej, dodajemy do stosu liczowego wartosc zmiennej t
+            if(t != -1) {
+                push_int(numbers, t);
+                // I resetujemy wartosci pomocniczne do czytania liczb:
+                t = -1;
+                power = 1;
+            }
+            // Gdybysmy nie mieli zadnej liczby przed operatorzem, oznaczaloby to, ze uzytkownik
+            // podal 2 operatory jeden za drugim, a tak nie mozna nie nie
+            else{
+                 // Wywalamy blad
+                 printf("Podano 2 operatory jeden za drugim! \nNalezy rowniez pamietac, ze kalkulator mial nie uwzledniac znakow liczb, wiec wszystkie minusy przed liczbami nie wchodza w gre");
+                 exit(1);
+            }
+        }
+        // Jezeli nie jest operatorem, to jest liczba
+        else {
+            if(t == -1) t=0; // Zebysmy nie mieli o 1 za malo
+            // Czytamy liczb OD PRAWEJ DO LEWEJ!
+            t += charToInt(equationElement) * power;
             power*=10;
         }
-
-        // Jezeli pojawi sie nam operator, a nie mamy zadnego wczesniejszego zapisanego
-        else if(operator == 0 && currentCharacterIsOperator == 1){
-            power = 1; // Bedziemy teraz przypisywac wartosc innego argumentu, wiec wracamy do 1. wielokrotnosci 10
-
-            if(c == '+' || c == '-'){
-                result += executeSimpleMathOperation(c,result,arg1);
-                arg1= 0;
-            }
-            else operator = c;
-        }
-
-        // Jezeli mamy juz zlapany operator, to cyfry wlatuja do argumentu drugiego
-        else if(operator!=0 && currentCharacterIsOperator == 0){
-            arg2+= (float)(charToInt(c) * power);
-            power*10;
-
-        }
-        // Jezeli mamy obydwa argumenty i dostaniemy kolejny operator, to dwa argumenty lacza sie w jeden
-        else if(operator!=0 && currentCharacterIsOperator){
-            power = 1;
-            if(c == '+' || c =='-'){
-                result+= executeSimpleMathOperation(operator,arg2,arg1);
-                operator = 0;
-                arg1=0;
-                arg2=0;
-            } else{
-                arg1 = executeSimpleMathOperation(operator,arg2,arg1);
-                operator = c;
-                arg2=0;
-            }
-        }
     }
+    // Po zakonczeniu petli musimy dodac jeszcze ostatnia liczbe
+    push_int(numbers,t);
+    free(equationAsStack); // Nie potrzebujemy juz tego stosu, wiec go kasujemy
 
-    if(operator != 0) result+=executeSimpleMathOperation(operator,arg2,arg1);
+    // W tym momencie mamy 2 stosy:
+    // 1. stos samych operatorow
+    // 2. stos samych liczb
+
+    // Zeby rozwiazac rownanie, musimy liczyc OD LEWEJ DO PRAWEJ, tak nakazuje kolejnosc wykonywania dzialan
+    // idea stosu to FIRST IN LAST OUT, wiec, zeby liczyc od lewej do prawej musimy:
+    // 1. wszystkie ZNAKI rownania (z pominieciem spacji ) wrzucic na stos znakow rownania
+    // 2. nastepnie sciagac kolejne elementy tego stosu i segregowac je w zaleznosci od tego,
+    //    czy sa one liczba, czy operatorem, na 2 inne stosy
+
+    // Wtedy, gdy bedziemy mogli sciagac elementy ze stosu z kolejnoscia z jaka one zostaly one podane przez uzytkownika
+
+    float result = 0;
+    float arg1 = (float) pop_int(numbers); // Rzutujemy na float'a
+    float arg2 = (float) pop_int(numbers);
+    char operator = pop_char(operators);
+    char nextOperator;
+
+    while(isEmpty_int(numbers) == 0 && isEmpty_char(operators) == 0){
+        nextOperator = pop_char(operators);
+        // Na koncu kazdego scenariusza dzieje sie 2 te same rzeczy:
+        // 1. argument drugi- kolejny element sciagniety ze stosu liczbowego
+        // 2. operator- kolejny element sciagniety ze stosu znakowego
+
+        // Jezeli mamy operator wyzszego priorytegu, to wykonujemy operacje od razu
+        if(operator == '*' || operator == '/'){
+            // ale nie dodajemy wyniku operacji do ogolnego wyniku, bo gdybysmy mieli 5*3*3,
+            // to wynik z dzialania 5*3 musimy jeszcze przemnozyc przez 3
+            //
+            // zamiast tego, scalamy 2 argumenty w jeden
+            arg1 = executeSimpleMathOperation(operator,arg1,arg2);
+        }
+        // W przeciwnym wypadku mamy albo dodawanie albo mnozenie
+        else {
+            // Sprawdzamy czy nastepny operator nie jest z wyzszym priorytetem
+            if(nextOperator == '*' || nextOperator == '/'){
+                // Jezeli jest to, pierwszy argument obecnej operacji jest dodawany do wyniku ogolnego
+                result+= arg1;
+                // drugi argument staje sie pierwszym
+                // DODATKOWO: Jezeli obecna operacja (ta nie nastepna) to odejmowanie,
+                //            to musimy zmienic znak ktoregos z argumentow
+                arg1 = operator == '-' ? (-1) * arg2 : arg2;
+            }
+            // W przeciwnym razie nastepna operacja to dodawanie albo odejmowanie
+            else{
+                // Wiec podobnie laczymy 2 argumenty w 1
+                arg1 = executeSimpleMathOperation(operator,arg1,arg2);
+            }
+        }
+
+        // Koniec kazdego scenariusza
+        arg2= (float) pop_int(numbers);
+        operator = nextOperator;
+    }
+    // Na koncu petli zostajemy z jeszcze 1 operacja do wykonania
+    result += executeSimpleMathOperation(operator,arg1,arg2);
 
     printf("\nWYNIK: %f", result);
 

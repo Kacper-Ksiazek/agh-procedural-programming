@@ -1,17 +1,30 @@
-#include "stack.h" // to jest do typow stosu
+#include "char_stack.h" // to jest do typow stosu
 #include "stdlib.h" // to jest do calloca i malloca
 #include "stdio.h" // printf, exit
+#include "config.h"
 
 // Moje pomocnicze funkcje
-int findLastElementIndex(StackItem **pStack);
-void throwError(char *functionName);
+int findLastElementIndex_char(CharStackItem **pStack){
+    if(isEmpty_char(pStack)) return -1;
+    int index = 0;
+    while(pStack[index]->pNext !=NULL) index++;
 
-StackItem** createStack(){
+    return index;
+}
+
+void throwError_char(char *functionName){
+    fprintf(stderr, "Proba wywolania %s top_char na pustym zbiorze", functionName);
+    exit(1);
+}
+
+
+
+CharStackItem** createCharStack(){
     // W typescript'cie to mozna robic za pomoca operatora "as"
     // Uzywajac okraglych nawiasow przed wyrazaniem ZMIENIAMY JEGO TYP
-    // zarowno malloc jak i calloc defaultowo zwracaja "void*" a my chcemy "StackItem*"
+    // zarowno malloc jak i calloc defaultowo zwracaja "void*" a my chcemy "CharStackItem*"
     //
-    StackItem** result = (StackItem**) calloc( MAX_STACK_LENGTH, sizeof(StackItem));
+    CharStackItem** result = (CharStackItem**) calloc(MAX_STACK_LENGTH, sizeof(CharStackItem));
     // O to sie Onder pamietam z wykladu xDDD sral
     if(result == NULL){
         printf("Blad podczas tworzenia tablicy struktur!!!!");
@@ -20,7 +33,7 @@ StackItem** createStack(){
     return result;
 }
 
-int isEmpty(StackItem** pStack){
+int isEmpty_char(CharStackItem** pStack){
     // Roznica pomiedzy callockiem a mallockiem jest taka, ze:
     // - uzywajac callocka: default'owa wartosc dla wszystkich elementow tablicy to 0
     // - uzywajac mallocka: brak default'owej wartosci, dlatego podczas
@@ -29,16 +42,16 @@ int isEmpty(StackItem** pStack){
     return 0;
 }
 
-void push(StackItem** pStack, char x){
+void push_char(CharStackItem** pStack, char x){
     // Musimy uzyc malloca, zeby ominac gargabe collector kompilatora C
     // garbage collector to taki mechanizm, ktory sprzata (kasuje) zmienne po zakonczeniu wykonywania funkcji
     // a my nie chcemy, zeby nasza struktura przepadla, dlatego deklarujemy ja w taki sposob
 
-    StackItem *freshElement = (StackItem*) malloc(sizeof(StackItem));
+    CharStackItem *freshElement = (CharStackItem*) malloc(sizeof(CharStackItem));
     freshElement->key = x;
     freshElement->pNext = NULL;
 
-    if(isEmpty(pStack) == 1){
+    if(isEmpty_char(pStack) == 1){
         pStack[0] = freshElement;
     } else {
         int length = 0;
@@ -64,40 +77,40 @@ void push(StackItem** pStack, char x){
     // CLION mowi ze na koncu void'owej funkcji nie trzeba pisac return'a
 }
 
-char pop(StackItem** pStack){
+char pop_char(CharStackItem** pStack){
     // Znajdujemy index ostatniego elementu
-    int index = findLastElementIndex(pStack);
+    int index = findLastElementIndex_char(pStack);
 
     // Sprawdzamy, czy stos nie jest pusty
-    if(index == -1) throwError("pop");
+    if(index == -1) throwError_char("pop_char");
 
     // Zapisujemy znak pod tym indexem
     char result = pStack[index]->key;
 
-    // Uzywamy funkcji del do skasowania ostataniego elementu, jak i referencji do niego w przedostatnim elemencie
-    del(pStack);
+    // Uzywamy funkcji del_char do skasowania ostataniego elementu, jak i referencji do niego w przedostatnim elemencie
+    del_char(pStack);
 
     // Zwracamy uprzednio zapisany element
     return result;
 }
 
-char top(StackItem **pStack){
+char top_char(CharStackItem **pStack){
     // Znajdujemy index ostatniego elementu
-    int index = findLastElementIndex(pStack);
+    int index = findLastElementIndex_char(pStack);
 
     // Sprawdzamy, czy stos nie jest pusty
-    if(index == -1) throwError("top");
+    if(index == -1) throwError_char("top_char");
 
     // Zwracamy wartosc ostatniego elemetu
     return pStack[index]->key;
 }
 
-void del(StackItem **pStack){
+void del_char(CharStackItem **pStack){
     // Znajdujemy index ostatniego elementu
-    int index = findLastElementIndex(pStack);
+    int index = findLastElementIndex_char(pStack);
 
     // Sprawdzamy, czy stos nie jest pusty
-    if(index == -1) throwError("del");
+    if(index == -1) throwError_char("del_char");
 
     // Kasujemy w przedostatnim elemencie reference do ostatniego elementu
     if(index != 0) pStack[index-1]->pNext= NULL;
@@ -107,15 +120,12 @@ void del(StackItem **pStack){
     pStack[index] = NULL;
 }
 
-int findLastElementIndex(StackItem **pStack){
-   if(isEmpty(pStack)) return -1;
-   int index = 0;
-   while(pStack[index]->pNext !=NULL) index++;
-    
-   return index;
-}
+void printCharStack(CharStackItem **pStack){
+    printf("\nPrinting CharStack:");
+    CharStackItem *element = pStack[0];
 
-void throwError(char *functionName){
-    fprintf(stderr, "Proba wywolania %s top na pustym zbiorze", functionName);
-    exit(1);
+    while(element != NULL){
+        printf("\n- %c", element->key);
+        element = element->pNext;
+    }
 }
