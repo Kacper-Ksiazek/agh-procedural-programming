@@ -49,6 +49,13 @@ int main(){
     push_int(numbers,t);
     free(equationAsStack); // Nie potrzebujemy juz tego stosu, wiec go kasujemy
 
+    // Sprawdzamy, czy przypadkiem nie jest taka sytuacja, ze user podal jedynie jedna liczbe
+    // bez zadnego operatora
+    if(isEmpty_char(operators)){
+        printf("Nie moze istniec dzialanie matematyczne bez zadnego operatora!!!\nWynikiem jest, to co podales");
+        exit(1);
+    }
+
     // W tym momencie mamy 2 stosy:
     // 1. stos samych operatorow
     // 2. stos samych liczb
