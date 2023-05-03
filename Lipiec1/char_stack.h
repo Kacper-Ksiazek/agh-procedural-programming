@@ -1,5 +1,5 @@
-#ifndef LIPIEC_PROJEKT_1_CHAR_STACK_H
-#define LIPIEC_PROJEKT_1_CHAR_STACK_H
+#ifndef CHAR_STACK_H
+#define CHAR_STACK_H
 
 typedef struct charStackItem{
     char key;

@@ -52,7 +52,7 @@ int main(){
     // Sprawdzamy, czy przypadkiem nie jest taka sytuacja, ze user podal jedynie jedna liczbe
     // bez zadnego operatora
     if(isEmpty_char(operators)){
-        printf("Nie moze istniec dzialanie matematyczne bez zadnego operatora!!!\nWynikiem jest, to co podales");
+        printf("Nie moze istniec dzialanie matematyczne bez zadnego operatora!!!\nWynikiem jest to, co podales");
         exit(1);
     }
 

@@ -1,5 +1,5 @@
-#ifndef LIPIEC_PROJEKT_1_INT_STACK_H
-#define LIPIEC_PROJEKT_1_INT_STACK_H
+#ifndef INT_STACK_H
+#define INT_STACK_H
 
 typedef struct tagStackItem{
     int key;
@@ -16,4 +16,4 @@ int isEmpty_int(IntStackItem** pStack);//zwraca 1, jeśli stos pusty
 // Extra ode mnie
 void printIntStack(IntStackItem **pStack);
 
-#endif //LIPIEC_PROJEKT_1_INT_STACK_H
+#endif

@@ -25,9 +25,10 @@ CharStackItem** createCharStack(){
     // zarowno malloc jak i calloc defaultowo zwracaja "void*" a my chcemy "CharStackItem*"
     //
     CharStackItem** result = (CharStackItem**) calloc(MAX_STACK_LENGTH, sizeof(CharStackItem));
-    // O to sie Onder pamietam z wykladu xDDD sral
+    // Musimy sprawdzic, czy udalo sie zaakalowac pamiec
     if(result == NULL){
         printf("Blad podczas tworzenia tablicy struktur!!!!");
+        exit(1);
     }
 
     return result;
