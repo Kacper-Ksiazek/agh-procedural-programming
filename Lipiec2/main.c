@@ -37,7 +37,7 @@ int *createArrayWithRandomValues(int size, int min, int max){
 }
 
 int main(){
-    const int ARRAY_LENGTH = 8;
+    const int ARRAY_LENGTH = 9;
     int *p = createArrayWithRandomValues(ARRAY_LENGTH, -11,10);
 
     pFun function[] = {&bubbleSort,&insertionSort,&hybridBubbleSort, &selectionSort};

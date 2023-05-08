@@ -24,7 +24,7 @@ void heaptify(int *array, int i, int length){
 
 void heapSort(int *array,int length){
     // Przygotowac heap'a
-    for(int i = (length/2) -1;i>=0;i--){
+    for (int i = length / 2 - 1; i >= 0; i--){
         heaptify(array,i,length);
     }
 
@@ -34,11 +34,11 @@ void heapSort(int *array,int length){
         array[0] = array[i];
         array[i] = t;
 
-        heaptify(array,0,length);
+        heaptify(array,0,i);
     }
 
-
     printIntArray(array,length);
+
 
     //
 }
