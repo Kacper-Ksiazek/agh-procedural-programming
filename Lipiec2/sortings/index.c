@@ -1,8 +1,7 @@
-#include "sortings.h"
-#include "stdio.h"
+#include "index.h"
+#include "stdbool.h"
 
 void bubbleSort(int *array, int length){
-    printf("Bubble sort: ");
     int a,b,t;
 
     for(int i = 0; i< length-1; i++){
@@ -14,13 +13,9 @@ void bubbleSort(int *array, int length){
             }
         }
     }
-
-    printIntArray(array,length);
 }
 
 void insertionSort(int *array, int length){
-    printf("\nInsertion sort: ");
-
     int j,key,t;
     for(int i = 1; i< length; i++){
         j = i-1;
@@ -31,38 +26,26 @@ void insertionSort(int *array, int length){
         };
         array[j+1] = key;
     }
-
-    printIntArray(array,length);
 }
 
-// Hybrid bubble sort = bubble sort + insertion sort
+// Ogolnie to jest bubble sort ktory jak stwierdzi, ze nei posortowal niczego, to konczy funkcje, a nie leci dalej
 void hybridBubbleSort(int *array,int length){
-    int a,b,t; // Do bubble sorta
-    int j, indexOfLastSwappedElement; // Do insertion sorta
+    int i, j,t;
+    bool thereWasASwap;
+    for (i = 0; i < length - 1; i++) {
+        thereWasASwap = false;
 
-    for(int i =0;i<length-1;i++){
-        indexOfLastSwappedElement=-1;
-        // Robimy jedna ture bubble sorta
-        // int j nie jest potrzebne, bo j juz jest zadeklarowane
-        for(j =0;j<length-1;j++){
-            if((a = array[j]) > (b= array[j+1])){
-                t = a;
-                array[j] = b;
-                array[j+1] = t;
-                indexOfLastSwappedElement=j;
+        for (j = 0; j < length- i - 1; j++) {
+            if (array[j] >array[j + 1]) {
+                t=array[j];
+                array[j] =array[j + 1];
+                array[j + 1] =t;
+                thereWasASwap = true;
             }
         }
-        // Jezeli bubble sort niczego nie posortowal albo jezeli posortowal jedynie pierwszy element,
-        // to znaczy, ze tablica jest gotowa
-        if(indexOfLastSwappedElement==-1 || indexOfLastSwappedElement == 0) return;
-        // W przeciwnym razie robimy insertion sorta
-        j = indexOfLastSwappedElement - 1;
-        t = array[indexOfLastSwappedElement];
-        while(j>=0 && array[j] > t){
-            array[j+1] = array[j];
-            j--;
-        }
-        array[j+1] = t;
+
+        // Jezeli nie bylo swap'a, to tablica jest juz uporzadkowana
+        if (thereWasASwap == false) break;
     }
 }
 
@@ -105,12 +88,3 @@ void  binaryInsertionSort(int *array, int length){
     }
 }
 
-void printIntArray(int *array, int length){
-    int i =0;
-    printf("[");
-    while(i < length){
-        printf("%d%s", array[i], i == length-1 ? "\0" : ", ");
-        i++;
-    }
-    printf("]");
-}

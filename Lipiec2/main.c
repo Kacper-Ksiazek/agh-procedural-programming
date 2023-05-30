@@ -1,61 +1,56 @@
 #include "stdio.h"
-#include "sortings.h"
-#include "stdlib.h"
-#include "heap_sort.h"
+#include "time.h"
+#include "utils.h"
+#include "sortings/index.h"
 
-//Zadanie 2
-//Porównanie sortowań:
-//- bąbelkowe;
-//- mieszane bąbęlkowe;
-//- proste wstawianie;
-//- proste wybieranie;
-//- połówkowe (zmodyfikowane proste wstawianie);
-//- HeapSort (stogowe z funkcją update(), która przywraca warunek stogu);
-//- szybkie;
-//Rozmiar tablicy dynamicznej (zwalnianie pamięci!) tworzony w main. Zdefiniować typ wskaźnikowy na funkcje typu void z dwoma parametrami typu int* i int
-//        i zdefiniować tablicę adresów(nazw funkcji) sortujących i tablicę const char* zaweirającą nazwy sortowań - obie deklarowane bezrozmiarowo - rozmiar na podstawie inicjacji tablicy;
-//Pętla testująca sortowania działa tyle razy ile sizeof(SortFun)/sizeof(pFun) gdzie SortFun to tablica z adresami, a pFun, to typ elementu tej tablicy.
-//Ważne, żeby sortowania były realizowane na identycznie zainicjowanej tablicy Po alokacji.
-//
-int randomIntFromRange(int min, int max){
-    // Na to jest wzor po prostu, bez filozofii
-    return (rand() % (max - min + 1)) + min;
-}
+typedef void (*pFun)(int*, int);
 
-int *createArrayWithRandomValues(int size, int min, int max){
-    int *p = (int *) calloc(size,sizeof(int));
-    // Sprawdzamy, czy udalo sie utworzyc tablice
-    if( p == NULL){
-        printf("nie udalo sie zaalokowac pamieci wymaganej do prawidlowego utworzenia tablicy!");
-        exit(1);
-    }
-    // Wypelniamy ja losowymi wartosciami
-    int i= 0;
-    while (i!=size) p[i++] = randomIntFromRange(min, max);
-    //
-    return p;
-}
+typedef struct FunctionWithLabel{
+    char* label;
+    pFun fn;
+} FunctionWithLabel;
+
 
 int main(){
-    const int ARRAY_LENGTH = 9;
-    int *p = createArrayWithRandomValues(ARRAY_LENGTH, -11,10);
+    printf("PROJEKT 2: Porownanie sortowan\n\nParametry generowanej tablicy: \n");
+    const int arrayLength= getNumberFromUser("  -Ilosc elementow w tablicy: ", false);
+    Range *range = getRangeFromUser();
 
-    pFun function[] = {&bubbleSort,&insertionSort,&hybridBubbleSort, &selectionSort};
-    char* names[]={"Bubble sort", "Insertion sort", "Hybrid Bubble sort", "Selection sort"};
+    const int *originalArrayPointer = createArrayWithRandomValues(arrayLength, range);
 
-    printIntArray(p, ARRAY_LENGTH);
-    printf("\n");
+//    printf("\nWygenerowana tablica: \n");
+//    printIntArray((int*) originalArrayPointer,arrayLength);
 
-    heapSort(p,ARRAY_LENGTH);
+    const FunctionWithLabel functions[]= {
+            {"Babelkowe (bubbleSort)", &bubbleSort},
+            {"Mieszane babelkowe (hybridBubbleSort)", &hybridBubbleSort},
+            {"Proste wstawianie (insertionSort)", &insertionSort},
+            {"Proste wybieranie (selectionSort", &selectionSort },
+            {"Polowkowe; zmodyfikowane proste wstawianie (binaryInsertionSort)", &binaryInsertionSort},
+            {"HeapSort", &heapSort},
+            {"Szybkie (quickSort)", &quickSort}
+    };
 
-//    printf("\n");
-////    insertionSort(p,ARRAY_LENGTH);
-//    printf("\n");
-////    bubbleSort(p,ARRAY_LENGTH);
-//    binaryInsertionSort(p,ARRAY_LENGTH);
-//
-//    printf("\n");
-//    printIntArray(p, ARRAY_LENGTH);
+    const unsigned short amountOfSortingFunctions = sizeof(functions)/ sizeof(FunctionWithLabel);
 
+    printf("\nPorownanie czasu sortowan:\n");
+
+    for(int i = 0; i< amountOfSortingFunctions;i++ ){
+        printf("%d- %s\n", i+1,functions[i].label);
+        int *array = cloneIntArray(originalArrayPointer,arrayLength);
+
+        clock_t start,end;
+        start = clock();
+
+        functions[i].fn(array,arrayLength);
+
+        end = clock();
+
+        // Roznica czasu pomiedzy startem i koncem wyrazona w sekundach
+        const float deltaTime =  ( (float)(end - start) / CLOCKS_PER_SEC );
+
+        printf("   Czas: ");
+        printTime(deltaTime);
+    }
     return 0;
 }
