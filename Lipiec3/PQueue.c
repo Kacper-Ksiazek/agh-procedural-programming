@@ -1,13 +1,14 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+#include "ERROR_MESSAGES.h"
 #include "tools.h"
 #include "global.h"
 #include "PQueue.h"
 
 PQueue *PQCreate(int length) {
     PQueue* result = malloc(sizeof(PQueue));
-    ensureProperMemoryAllocation(result);
+    checkPointer(result, ERROR_MEMORY_ALLOCATION_QUEUE);
 
     // Dlugosc kolejki ustawiona jest na wartosc z argumentu
     result->nPQSize = length;
@@ -15,18 +16,22 @@ PQueue *PQCreate(int length) {
 
     // Alokujemy pamiec dla tablicy wskaznikow do struktur (dla naszej kolejki wlasciwej)
     result->pQueue = calloc(length,sizeof(PQItem*));
-    ensureProperMemoryAllocation(result->pQueue);
+    checkPointer(result->pQueue,ERROR_MEMORY_ALLOCATION_PQINFO);
 
     return result;
 }
 
 int PQIsEmpty(PQueue *queue) {
+    checkPointer(queue,ERROR_NULL_POINTER_QUEUE);
+
     if(queue->nPQCurrentSize == 0 ) return 1;
     else return 0;
 }
 
 int PQSize(PQueue *queue) {
-    return queue->nPQSize;
+    checkPointer(queue,ERROR_NULL_POINTER_QUEUE);
+
+    return queue->nPQCurrentSize;
 }
 
 int PQMaxPrior(PQueue *queue) {

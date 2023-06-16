@@ -3,9 +3,9 @@
 
 #include "tools.h"
 
-void ensureProperMemoryAllocation(void *p) {
+void checkPointer(void *p, char *msgOnError) {
     if(p == NULL){
-        fprintf(stderr,"Memory could not have been allocated!");
+        fprintf(stderr,"%s", msgOnError);
         exit(1);
     }
 }
