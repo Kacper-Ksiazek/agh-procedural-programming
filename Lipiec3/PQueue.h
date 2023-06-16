@@ -3,7 +3,7 @@
 
 // 1. Constants
 
-#define PRIOR_ERROR 1
+#define PRIOR_ERROR (-1)
 #define POS_ERROR (-1)
 
 // -------------
@@ -95,7 +95,7 @@ PQINFO *PQDequeue(PQueue *queue);
  * @param freeMemory pointer to the function which is responsible for releasing a memory
  *                   occupied by one queue's element
  */
-void PQClear(PQueue *queue, void *freeMemory(const void *p));
+void PQClear(PQueue *queue, void (*freeMemory)(const void *p));
 
 
 /**
@@ -106,7 +106,7 @@ void PQClear(PQueue *queue, void *freeMemory(const void *p));
  * @param freeMemory pointer to the function which is responsible for releasing a memory
  *                   occupied by one queue's element
  */
-void PQRelease(PQueue *queue, void *freeMemory(const void *p));
+void PQRelease(PQueue *queue, void (*freeMemory)(const void *p));
 
 
 /**
@@ -116,7 +116,7 @@ void PQRelease(PQueue *queue, void *freeMemory(const void *p));
  * @param printUserInfo pointer to the function which prints single user info
  * @param index index of element to start printing on
  */
-void PQPrint(PQueue *queue, void *printUserInfo(const void *p), int index);
+void PQPrint(PQueue *queue, void (*printUserInfo)(const void *p), int index);
 
 
 /**
@@ -124,11 +124,11 @@ void PQPrint(PQueue *queue, void *printUserInfo(const void *p), int index);
  *
  * @param queue pointer to the queue
  * @param priority priority to be set
- * @param info queue element with priority to change
- * @param compareTwoQueueElements pointer to the function which compares two queue elements
+ * @param info PQINFO with priority to change
+ * @param compareTwoUserInfo pointer to the function which compares two user info structures
  * @return either previous priority or PRIOR_ERROR when there is no such info element in the queue
  */
-int PQSetPrior(PQueue *queue, int priority, PQInfo *info, int *compareTwoQueueElements(const void *a, const void *b));
+int PQSetPrior(PQueue *queue, int priority, PQINFO *info, int (*compareTwoUserInfo)(const void *a, const void *b));
 
 
 /**
@@ -146,11 +146,11 @@ int PQsetPrior(PQueue *queue, int priority, int index);
  * Get a priority of particular queue element
  *
  * @param queue pointer to the queue
- * @param info queue element whose priority we want to get
- * @param compareTwoQueueElements pointer to the function which compares two queue elements
+ * @param info PQINFO whose priority we want to get
+ * @param compareTwoUserInfo pointer to the function which compares two user info structures
  * @return either previous priority or PRIOR_ERROR when there is no such info element in the queue
  */
-int PQGetPrior(PQueue *queue, PQInfo *info, int *compareTwoQueueElements(const void *a, const void *b));
+int PQGetPrior(PQueue *queue, PQINFO *info, int (*compareTwoUserInfo)(const void *a, const void *b));
 
 
 /**
@@ -160,7 +160,7 @@ int PQGetPrior(PQueue *queue, PQInfo *info, int *compareTwoQueueElements(const v
  * @param index index of element element whose priority we want to get
  * @return either previous priority or PRIOR_ERROR when there is no info element with such index in the queue
  */
-int PQgetPrior(PQueue *queue, int priority, int index);
+int PQgetPrior(PQueue *queue, int index);
 
 
 /**
@@ -168,10 +168,10 @@ int PQgetPrior(PQueue *queue, int priority, int index);
  *
  * @param queue pointer to the queue
  * @param info queue element whose index we want to get
- * @param compareTwoQueueElements pointer to the function which compares two queue elements
+ * @param compareTwoUserInfo pointer to the function which compares two user info structures
  * @return either user info's index or POS_ERROR when such element is not present in the queue
  */
-int PQFind(PQueue *queue, PQInfo *info, int *compareTwoQueueElements(const void *a, const void *b));
+int PQFind(PQueue *queue, PQInfo *info, int (*compareTwoUserInfo)(const void *a, const void *b));
 
 
 // -------------
@@ -181,18 +181,18 @@ int PQFind(PQueue *queue, PQInfo *info, int *compareTwoQueueElements(const void 
 /**
  * Restore heap via comparing nodes with its children and performing swaps if necessary (two comparison per iteration)
  *
- * @param arrayOfPQInfo pointer to the array of pointers to user info
+ * @param arrayOfPQItems pointer to the array of pointers to PQItem
  * @param start left index
  * @param stop right index
  */
-static void UpdateDown(PQItem **arrayOfPQInfo, int start, int stop);
+static void UpdateDown(PQItem **arrayOfPQItems, int start, int stop);
 
 
 /**
  * Restore heap via comparing children with corresponding parent and performing swaps if necessary (one comparison per iteration)
  *
- * @param arrayOfPQInfo pointer to the array of pointers to user info
+ * @param arrayOfPQItems pointer to the array of pointers to PQItem
  * @param start left index
  * @param stop right index
  */
-static void UpdateUp(PQItem **arrayOfPQInfo, int start, int stop);
+static void UpdateUp(PQItem **arrayOfPQItems, int start, int stop);
