@@ -15,4 +15,6 @@
 #define ERROR_NULL_POINTER_COMPARE_FN "Wskaznik na funkcje porownujaca dwie informacje uzytkownika jest rowny NULL"
 #define ERROR_NULL_POINTER_PRINT_FN "Wskaznik na funkcje wyswietlajaca pojedyncza informacje uzytkownika jest rowny NULL"
 
+// Miscellaneous
+
 #define ERROR_QUEUE_CAPACITY_EXCEEDED "Usiagnieto maksymalny rozmiar kolejki, nie mozna do niej dodac wiekszej ilosci elementow"
