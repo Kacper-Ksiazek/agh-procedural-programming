@@ -5,6 +5,7 @@
 #define ERROR_MEMORY_ALLOCATION_QUEUE "Nie udalo sie zaalokowac pamieci dla kolejki (PQueue)"
 #define ERROR_MEMORY_ALLOCATION_PQITEM "Nie udalo sie zaalkowac pamieci dla elementu kolejki (PQItem)"
 #define ERROR_MEMORY_ALLOCATION_PQINFO "Nie udalo sie zaalokowac pamieci dla informacji uzytkownika (PQINFO)"
+#define ERROR_MEMORY_ALLOCATION_PTAB "Nie udalo sie zaalkowac pamieci dla wartosci nTab informacji uzytkowina (PQINFO / nTab)"
 
 // NULL pointers
 
