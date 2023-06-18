@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stdarg.h"
+#include <stdarg.h>
 
 /**
  * Simplified version of printf function
@@ -42,7 +42,7 @@ void outChar( char c);
  *
  * @param string string to be printed
  */
-void outStr( char* string );
+void outStr(const char* string );
 
 
 /**
@@ -58,4 +58,4 @@ void outDouble( double x);
  *
  * @param x remaining integer to be printed
  */
-void outNum( unsigned int x );
+void outNum(int x );
