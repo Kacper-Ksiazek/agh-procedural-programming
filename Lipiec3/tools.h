@@ -8,19 +8,3 @@
  * @throw Error when memory has not been allocated properly
  */
 void checkPointer(void *p, char *msgOnError);
-
-
-/**
- *
- * Generates a random number within a given range (boundary values included)
- *
- * @param min min value
- * @param max max value
- * @return random number within a range
- */
-int getRandomNumberFromRange(int start, int stop);
-
-
-
-
-

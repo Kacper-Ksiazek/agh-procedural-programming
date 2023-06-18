@@ -43,11 +43,108 @@ PQINFO *createUserInfo(int key, int a, int b);
 
 
 int main() {
-    PQINFO *data1 = createUserInfo(1, 4, 5);
-    PQINFO *data2 = createUserInfo(2, 5, 6);
+    PQINFO *element1 = createUserInfo(1, 4, 5);
+    PQINFO *element2 = createUserInfo(2, 7, 8);
+    PQINFO *element3 = createUserInfo(3, 9, 10);
+    PQINFO *element4 = createUserInfo(4, 11, 12);
+    PQINFO *element5 = createUserInfo(5, 13, 14);
+    PQINFO *element6 = createUserInfo(6, 15, 16);
+    PQINFO *element7 = createUserInfo(7, 17, 18);
+    PQINFO *element8 = createUserInfo(8, 19, 20);
 
-//    printf("%d", compareTwoQueueElements(data1, data1));
-//    printUserInfo(data);
+    // 1. wykreowac kolejke 20-sto elementowa
+
+    PQueue *queue = PQCreate(20);
+
+
+    // 2. dodac 6 elementow z roznymi priorytetami i w różnej kolejnosci priorytetów - wydrukowac
+
+    printf("-----\nKROK 2: Dodanie 6 elementow do kolejki: \n");
+    PQEnqueue(queue, 9, element1);   // 1
+    PQEnqueue(queue, 8, element2);   // 2
+    PQEnqueue(queue, 7, element3);   // 3
+    PQEnqueue(queue, 10, element4);  // 4
+    PQEnqueue(queue, 1, element5);   // 5
+    PQEnqueue(queue, -1, element6);  // 6
+
+    PQPrint(queue, printUserInfo, 0);
+
+
+    // 3. usunac z kolejki (z najwiekszym priorytetem)  - wydrukowac
+
+    printf("\n\n\n-----\nKROK 3: Usuniecie elementu z najwyzszym priorytetem: \n");
+    printf("\nUsuniety element z najwyzszym priorytetem: \n");
+    printUserInfo(PQDequeue(queue));
+    printf("\n");
+    PQPrint(queue, printUserInfo, 0);
+
+
+    // 4. dodac dwa elementy - wydrukowac
+
+    printf("\n\n\n-----\nKROK 4: Dodanie 2 dodatkowych elementow: \n");
+    PQEnqueue(queue, -200, element7);  // 1
+    PQEnqueue(queue, 20, element8);    // 2
+    PQPrint(queue, printUserInfo, 0);
+
+
+    // 5. wyszukac jeden element
+
+    printf("\n\n\n-----\nKROK 5: Wyszukanie pojedynczego elementu: \n");
+    printf("\nPozycja elementu o kluczu = 7 wynosi: %d", PQFind(queue, element7, compareTwoQueueElements));
+
+
+    // 6. zwiekszyc mu priorytet (unikalny) - wydrukowac
+
+    printf("\n\n\n-----\nKROK 6: Zwiekszenie priorytetu pojedynczego elementu (elementu o kluczu 7): \n");
+    PQSetPrior(queue, 300, element7, compareTwoQueueElements);
+    PQPrint(queue, printUserInfo, 0);
+
+
+    // 7. zmniejszyc priorytet innemu elementowi (unikalny) - wydrukowac
+
+    printf("\n\n\n-----\nKROK 7: Zmniejszenie priorytetu pojedynczego elementu (elementu o kluczu 6): \n");
+    PQSetPrior(queue, -10, element6, compareTwoQueueElements);
+    PQPrint(queue, printUserInfo, 0);
+
+
+    // 8. usuac cala kolejke
+
+    printf("\n\n\n-----\nKROK 8: Usunac cala kolejke: \n");
+    PQRelease(&queue, freeMemory);
+    printf("\n%s", queue == NULL ? "Kolejka zostala wyczyszczona" : "BLAD! KOLEJKA NIE ZOSTALA WYCZYSZCZONA");
+
+
+    // 9. przetestowac jak bedzie sie zachowywac modul jesli powtorza sie priorytety niektorych elementow
+    //    (zmienic priorytet np na maksymalny - powtorzy sie i sciagnac dwa razy, po kazdym drukowanie)
+    printf("\n\n\n-----\nKROK 9 Sytuacja w ktorej powtorzy sie najwiekszy priorytet: \n");
+
+    queue = PQCreate(10);
+    element1 = createUserInfo(1, 4, 5);
+    element2 = createUserInfo(2, 7, 8);
+    element3 = createUserInfo(3, 9, 10);
+    element4 = createUserInfo(4, 11, 12);
+    element5 = createUserInfo(5, 13, 14);
+
+    PQEnqueue(queue, 10, element1);
+    PQEnqueue(queue, 10, element2);
+    PQEnqueue(queue, 10, element3);
+    PQEnqueue(queue, 2, element4);
+    PQEnqueue(queue, 9, element5);
+
+    PQPrint(queue, printUserInfo, 0);
+
+    printf("\n\nSciaganie elementow: \n");
+
+    printf("1. Pierwszy sciagniety zostal element o kluczu: %d\n", PQDequeue(queue)->nKey);
+    PQPrint(queue, printUserInfo, 0);
+
+    printf("\n\n2. Drugi sciagniety zostal element o kluczu: %d\n", PQDequeue(queue)->nKey);
+    PQPrint(queue, printUserInfo, 0);
+
+    printf("\n\n3. Trzeci sciagniety zostal element o kluczu: %d\n", PQDequeue(queue)->nKey);
+    PQPrint(queue, printUserInfo, 0);
+
+    printf("\n\nWNIOSEK: Elementy z rownymi priorytetami zostaja sciagane w kolejnosci, w ktorej zostaly dodane");
 
     return 0;
 }
@@ -83,7 +180,6 @@ void freeMemory(const void *p) {
 
     free(info->pTab);
     free((void *) info);
-    p = NULL;
 }
 
 int compareTwoQueueElements(const void *a, const void *b) {

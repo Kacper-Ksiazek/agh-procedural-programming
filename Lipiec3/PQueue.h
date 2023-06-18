@@ -1,4 +1,5 @@
 #pragma once
+
 #include "global.h"
 
 // 1. Constants
@@ -10,7 +11,7 @@
 
 // 2. Structures
 
-typedef struct PQItem{
+typedef struct PQItem {
     /** Priority of the element */
     int nPrior;
     /** Queue element's value */
@@ -38,7 +39,7 @@ typedef struct PQueue {
  * @throw Error when memory could not be allocated properly
  * @return pointer to created queue
  */
-PQueue* PQCreate(int length);
+PQueue *PQCreate(int length);
 
 
 /**
@@ -102,11 +103,11 @@ void PQClear(PQueue *queue, void (*freeMemory)(const void *p));
  * Release entire memory allocated for queue along with memory allocated for all of its elements;
  * converts pointer to the queue to the NULL pointer
  *
- * @param queue pointer to the queue
+ * @param queue pointer to the pointer to the queue
  * @param freeMemory pointer to the function which is responsible for releasing a memory
  *                   occupied by one queue's element
  */
-void PQRelease(PQueue *queue, void (*freeMemory)(const void *p));
+void PQRelease(PQueue **queue, void (*freeMemory)(const void *p));
 
 
 /**

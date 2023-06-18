@@ -117,6 +117,7 @@ int PQEnqueue(PQueue *queue, int priority, PQINFO *data) {
 
     // Ensure there is a space for one more entry
     if (PQSize(queue) == queue->nPQSize) {
+
         // Throw an error via NULL pointer
         checkPointer(NULL, ERROR_QUEUE_CAPACITY_EXCEEDED);
         return 0;
@@ -191,17 +192,17 @@ void PQClear(PQueue *queue, void (*freeMemory)(const void *)) {
     queue->nPQCurrentSize = 0;
 }
 
-void PQRelease(PQueue *queue, void (*freeMemory)(const void *)) {
+void PQRelease(PQueue **queue, void (*freeMemory)(const void *)) {
     checkPointer(queue, ERROR_NULL_POINTER_QUEUE);
     checkPointer(freeMemory, ERROR_NULL_POINTER_FREEMEMORY_FN);
 
     // Free entire memory taken by array of PQItems
-    PQClear(queue, freeMemory);
+    PQClear(*queue, freeMemory);
 
     // Free memory taken by queue structure;
-    free(queue);
+    free(*queue);
+    *queue = NULL;
 
-    queue = NULL;
 }
 
 void PQPrint(PQueue *queue, void (*printUserInfo)(const void *), int index) {
@@ -209,11 +210,16 @@ void PQPrint(PQueue *queue, void (*printUserInfo)(const void *), int index) {
     checkPointer(printUserInfo, ERROR_NULL_POINTER_PRINT_FN);
 
     int queueSize = PQSize(queue);
-    if (queueSize) return;
+    if (queueSize == 0) {
+        printf("\nKolejka jest pusta!");
+        return;
+    };
 
     PQItem *element = queue->pQueue[index];
 
-    printf("Priorytet elementu: %d", element->nPrior);
+    if (index == 0) printf("\nKolejka (%d %s):", queueSize, queueSize == 1 ? "element" : "elementow");
+
+    printf("\nPriorytet elementu: (%d), pozycja: [%d]\n", element->nPrior, index);
     printUserInfo(element->pInfo);
 
     // Print children
@@ -251,8 +257,15 @@ int PQsetPrior(PQueue *queue, int priority, int index) {
     int previousPriority = element->nPrior;
     element->nPrior = priority;
 
+    // Before reordering, swap this element with the last element in queue
+    int lastElementIndex = PQSize(queue) - 1;
+
+    PQItem *temp = queue->pQueue[lastElementIndex];
+    queue->pQueue[lastElementIndex] = element;
+    queue->pQueue[index] = temp;
+
     // Reorder queue
-    UpdateDown(queue->pQueue, 0, PQSize(queue) - 1);
+    UpdateUp(queue->pQueue, 0, PQSize(queue) - 1);
 
     return previousPriority;
 }
