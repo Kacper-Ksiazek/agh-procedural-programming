@@ -14,7 +14,7 @@ void printUserInfo(const void *p);
 
 
 /**
- * Compare two queue elements
+ * Compare two user info structures
  *
  * @param a pointer to user info
  * @param b pointer to user info
@@ -32,11 +32,11 @@ void freeMemory(const void *p);
 
 
 /**
- * Allocate memory required for structure and returns pointer to it
+ * Allocate memory required for structure and return pointer to it
  *
  * @param key value of nKey property
- * @param a value of nTab index 0
- * @param b value of nTab index 1
+ * @param a value of nTab at index 0
+ * @param b value of nTab at index 1
  * @return pointer to PQINFO structure
  */
 PQINFO *createUserInfo(int key, int a, int b);
