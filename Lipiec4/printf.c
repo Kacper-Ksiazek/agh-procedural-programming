@@ -63,10 +63,10 @@ void outDec(int x) {
 int Printf(const char *sFormat, ...) {
     va_list args;
     va_start(args, sFormat);
-    PrintfV(sFormat, args);
+    int res = PrintfV(sFormat, args);
     va_end(args);
 
-    return 0;
+    return res;
 }
 
 int PrintfV(const char *sFormat, va_list va_args) {
